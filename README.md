@@ -62,10 +62,13 @@ aberta.
 ## Contrato de chat
 
 O chat usa HTTP request/response contra `POST /tutors/{tutor_id}/chat`.
-Essa decisao favorece simplicidade, compatibilidade com iframe e menor
+O widget envia `message` e, quando existir, `session_token`; o backend retorna
+`answer`, `session_id` e `session_token` para continuar a conversa.
+
+A escolha por HTTP favorece simplicidade, compatibilidade com iframe e menor
 complexidade operacional no MVP. WebSocket fica como evolucao futura caso o
 produto precise de streaming de tokens, eventos em tempo real ou colaboracao
-simultanea. Mais detalhes em `docs/chat-communication.md`.
+simultanea.
 
 ## Validacao
 
