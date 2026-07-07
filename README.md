@@ -1,20 +1,20 @@
 # DOT_INTERVIEW_FRONTEND
 
-Frontend da solucao DOT Interview, construido com React, Vite e TypeScript.
+Frontend da solução DOT Interview, construído com React, Vite e TypeScript.
 
 ## Nota sobre autoria
 
-Este codigo foi produzido com o apoio de agentes de codificacao, nao por codificacao integralmente manual.
+Este código foi produzido com o apoio de agentes de codificação, não por codificação integralmente manual.
 
 ## Escopo da etapa 1
 
 - Base React/Vite/TypeScript.
 - Tela inicial do painel admin em `/`, preparada para listar tutores.
 - Widget de chat em `/widget/:tutorId`, preparado para uso dentro de um iframe.
-- Geracao de snippet de embed no painel admin para integracao em sites externos.
+- Geração de snippet de embed no painel admin para integração em sites externos.
 - Cliente de API tipado para as rotas atuais do backend.
 
-## Configuracao local
+## Configuração local
 
 Crie um arquivo `.env` a partir do exemplo:
 
@@ -22,10 +22,10 @@ Crie um arquivo `.env` a partir do exemplo:
 cp .env.example .env
 ```
 
-Variaveis disponiveis:
+Variáveis disponíveis:
 
-- `VITE_API_BASE_URL`: URL base do backend. Padrao: `http://localhost:8000`.
-- `VITE_API_TOKEN`: token enviado no header `X-API-Token`. Padrao local: `dev-api-token`.
+- `VITE_API_BASE_URL`: URL base do backend. Padrão: `http://localhost:8000`.
+- `VITE_API_TOKEN`: token enviado no header `X-API-Token`. Padrão local: `dev-api-token`.
 
 ## Desenvolvimento
 
@@ -34,19 +34,19 @@ pnpm install
 pnpm run dev
 ```
 
-O app fica disponivel em `http://localhost:5173`.
+O app fica disponível em `http://localhost:5173`.
 
 Exemplos de rotas:
 
 - Painel admin: `http://localhost:5173/`
 - Widget iframe: `http://localhost:5173/widget/{tutor_id}`
 
-## Widget embutivel
+## Widget embutível
 
-O fluxo principal para integradores e incorporar a rota `/widget/{tutor_id}`
+O fluxo principal para integradores é incorporar a rota `/widget/{tutor_id}`
 dentro de um iframe no site de destino. No painel admin, clique em `Embed`
 em um tutor para copiar a URL do widget, copiar o snippet HTML e testar o
-iframe em uma demonstracao rapida dentro do proprio painel.
+iframe em uma demonstração rápida dentro do próprio painel.
 
 ```html
 <iframe
@@ -58,9 +58,9 @@ iframe em uma demonstracao rapida dentro do proprio painel.
 ></iframe>
 ```
 
-O widget carrega os dados do tutor antes da conversa, mostra o nome do tutor no cabecalho e bloqueia o envio de mensagens quando o tutor esta inativo.
-Cada iframe abre uma conversa independente e continua a sessao usando o
-`session_token` retornado pelo backend enquanto a pagina do widget permanecer
+O widget carrega os dados do tutor antes da conversa, mostra o nome do tutor no cabeçalho e bloqueia o envio de mensagens quando o tutor está inativo.
+Cada iframe abre uma conversa independente e continua a sessão usando o
+`session_token` retornado pelo backend enquanto a página do widget permanecer
 aberta.
 
 ## Contrato de chat
@@ -70,14 +70,15 @@ O widget envia `message` e, quando existir, `session_token`; o backend retorna
 `answer`, `session_id` e `session_token` para continuar a conversa.
 
 A escolha por HTTP favorece simplicidade, compatibilidade com iframe e menor
-complexidade operacional no MVP. WebSocket fica como evolucao futura caso o
-produto precise de streaming de tokens, eventos em tempo real ou colaboracao
-simultanea.
+complexidade operacional no MVP. WebSocket fica como evolução futura caso o
+produto precise de streaming de tokens, eventos em tempo real ou colaboração
+simultânea.
 
-## Validacao
+## Validação
 
 ```bash
 pnpm run lint
 pnpm run build
 ```
+
 Repositório de frontend da solução de plataforma de tutores para entrevista na DOT Digital.
