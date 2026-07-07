@@ -1,5 +1,5 @@
-import { FormEvent, useState } from "react";
-import { sendTutorMessage } from "../api/tutors";
+import { FormEvent, useEffect, useRef, useState } from "react";
+import { getTutor, sendTutorMessage, type Tutor } from "../api/tutors";
 
 type ChatMessage = {
   id: string;
@@ -11,25 +11,67 @@ type TutorWidgetPageProps = {
   tutorId: string | null;
 };
 
+function createMessage(author: ChatMessage["author"], content: string): ChatMessage {
+  return {
+    id: crypto.randomUUID(),
+    author,
+    content,
+  };
+}
+
 export function TutorWidgetPage({ tutorId }: TutorWidgetPageProps) {
+  const [tutor, setTutor] = useState<Tutor | null>(null);
   const [message, setMessage] = useState("");
   const [sessionToken, setSessionToken] = useState<string | undefined>();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [isLoadingTutor, setIsLoadingTutor] = useState(Boolean(tutorId));
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  const isTutorActive = tutor?.status === "ACTIVE";
+  const canSendMessage = Boolean(tutorId && isTutorActive && !isSending && message.trim());
+  const inputPlaceholder = isTutorActive
+    ? "Digite sua pergunta"
+    : "Tutor indisponivel para conversa";
+
+  useEffect(() => {
+    setTutor(null);
+    setMessages([]);
+    setSessionToken(undefined);
+
+    if (!tutorId) {
+      setIsLoadingTutor(false);
+      return;
+    }
+
+    setIsLoadingTutor(true);
+    setError(null);
+
+    getTutor(tutorId)
+      .then(setTutor)
+      .catch((requestError) => {
+        setError(
+          requestError instanceof Error
+            ? requestError.message
+            : "Erro ao carregar tutor.",
+        );
+      })
+      .finally(() => setIsLoadingTutor(false));
+  }, [tutorId]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [messages, isSending]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!tutorId || !message.trim()) {
+    if (!canSendMessage || !tutorId) {
       return;
     }
 
-    const userMessage: ChatMessage = {
-      id: crypto.randomUUID(),
-      author: "user",
-      content: message.trim(),
-    };
+    const userMessage = createMessage("user", message.trim());
 
     setMessages((currentMessages) => [...currentMessages, userMessage]);
     setMessage("");
@@ -45,14 +87,14 @@ export function TutorWidgetPage({ tutorId }: TutorWidgetPageProps) {
       setSessionToken(response.session_token);
       setMessages((currentMessages) => [
         ...currentMessages,
-        {
-          id: response.session_id,
-          author: "assistant",
-          content: response.answer,
-        },
+        createMessage("assistant", response.answer),
       ]);
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : "Erro ao enviar mensagem.");
+      setError(
+        requestError instanceof Error
+          ? requestError.message
+          : "Erro ao enviar mensagem.",
+      );
     } finally {
       setIsSending(false);
     }
@@ -61,17 +103,34 @@ export function TutorWidgetPage({ tutorId }: TutorWidgetPageProps) {
   return (
     <main className="widget-shell">
       <header className="widget-header">
-        <strong>DOT Interview</strong>
-        <span>Assistente de entrevista</span>
+        <div>
+          <strong>{tutor?.name ?? "DOT Interview"}</strong>
+          <span>{tutor?.description ?? "Assistente de entrevista"}</span>
+        </div>
+        {tutor && (
+          <span className={`widget-status ${tutor.status.toLowerCase()}`}>
+            {isTutorActive ? "Online" : "Inativo"}
+          </span>
+        )}
       </header>
 
       <section className="messages" aria-live="polite">
         {!tutorId && (
-          <p className="state-message error">Informe o tutor na URL do widget.</p>
+          <p className="widget-notice error">Informe o tutor na URL do widget.</p>
         )}
 
-        {messages.length === 0 && tutorId && (
-          <p className="state-message">Envie uma pergunta para comecar.</p>
+        {isLoadingTutor && <p className="widget-notice">Carregando tutor...</p>}
+
+        {!isLoadingTutor && tutor && !isTutorActive && (
+          <p className="widget-notice error">
+            Este tutor esta inativo no momento.
+          </p>
+        )}
+
+        {!isLoadingTutor && tutor && isTutorActive && messages.length === 0 && (
+          <p className="widget-notice">
+            Envie uma pergunta para iniciar a conversa.
+          </p>
         )}
 
         {messages.map((chatMessage) => (
@@ -83,19 +142,20 @@ export function TutorWidgetPage({ tutorId }: TutorWidgetPageProps) {
           </article>
         ))}
 
-        {isSending && <p className="state-message">Gerando resposta...</p>}
-        {error && <p className="state-message error">{error}</p>}
+        {isSending && <p className="typing-state">Gerando resposta...</p>}
+        {error && <p className="widget-notice error">{error}</p>}
+        <div ref={messagesEndRef} />
       </section>
 
       <form className="message-form" onSubmit={handleSubmit}>
         <input
           aria-label="Mensagem"
-          disabled={!tutorId || isSending}
+          disabled={!tutorId || !isTutorActive || isSending}
           onChange={(event) => setMessage(event.target.value)}
-          placeholder="Digite sua pergunta"
+          placeholder={inputPlaceholder}
           value={message}
         />
-        <button disabled={!tutorId || isSending || !message.trim()} type="submit">
+        <button disabled={!canSendMessage} type="submit">
           Enviar
         </button>
       </form>
