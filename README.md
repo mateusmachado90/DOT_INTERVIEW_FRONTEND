@@ -2,6 +2,10 @@
 
 Frontend da solucao DOT Interview, construido com React, Vite e TypeScript.
 
+## Nota sobre autoria
+
+Este codigo foi produzido com o apoio de agentes de codificacao, nao por codificacao integralmente manual.
+
 ## Escopo da etapa 1
 
 - Base React/Vite/TypeScript.
