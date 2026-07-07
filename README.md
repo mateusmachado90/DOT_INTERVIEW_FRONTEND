@@ -7,6 +7,7 @@ Frontend da solucao DOT Interview, construido com React, Vite e TypeScript.
 - Base React/Vite/TypeScript.
 - Tela inicial do painel admin em `/`, preparada para listar tutores.
 - Widget de chat em `/widget/:tutorId`, preparado para uso dentro de um iframe.
+- Geracao de snippet de embed no painel admin para integracao em sites externos.
 - Cliente de API tipado para as rotas atuais do backend.
 
 ## Configuracao local
@@ -38,7 +39,10 @@ Exemplos de rotas:
 
 ## Widget embutivel
 
-Use a rota `/widget/{tutor_id}` dentro de um iframe na pagina onde o chat deve aparecer.
+O fluxo principal para integradores e incorporar a rota `/widget/{tutor_id}`
+dentro de um iframe no site de destino. No painel admin, clique em `Embed`
+em um tutor para copiar a URL do widget, copiar o snippet HTML e testar o
+iframe em uma demonstracao rapida dentro do proprio painel.
 
 ```html
 <iframe
@@ -51,6 +55,17 @@ Use a rota `/widget/{tutor_id}` dentro de um iframe na pagina onde o chat deve a
 ```
 
 O widget carrega os dados do tutor antes da conversa, mostra o nome do tutor no cabecalho e bloqueia o envio de mensagens quando o tutor esta inativo.
+Cada iframe abre uma conversa independente e continua a sessao usando o
+`session_token` retornado pelo backend enquanto a pagina do widget permanecer
+aberta.
+
+## Contrato de chat
+
+O chat usa HTTP request/response contra `POST /tutors/{tutor_id}/chat`.
+Essa decisao favorece simplicidade, compatibilidade com iframe e menor
+complexidade operacional no MVP. WebSocket fica como evolucao futura caso o
+produto precise de streaming de tokens, eventos em tempo real ou colaboracao
+simultanea. Mais detalhes em `docs/chat-communication.md`.
 
 ## Validacao
 
