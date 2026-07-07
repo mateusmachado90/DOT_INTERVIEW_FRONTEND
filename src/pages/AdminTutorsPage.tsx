@@ -44,6 +44,9 @@ function toPayload(form: TutorFormState): TutorPayload {
 export function AdminTutorsPage() {
   const [tutors, setTutors] = useState<Tutor[]>([]);
   const [selectedTutorId, setSelectedTutorId] = useState<string | null>(null);
+  const [embedTutorId, setEmbedTutorId] = useState<string | null>(null);
+  const [previewTutorId, setPreviewTutorId] = useState<string | null>(null);
+  const [copyFeedback, setCopyFeedback] = useState<string | null>(null);
   const [form, setForm] = useState<TutorFormState>(emptyForm);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -54,10 +57,30 @@ export function AdminTutorsPage() {
     () => tutors.find((tutor) => tutor.id === selectedTutorId) ?? null,
     [selectedTutorId, tutors],
   );
+  const embedTutor = useMemo(
+    () => tutors.find((tutor) => tutor.id === embedTutorId) ?? null,
+    [embedTutorId, tutors],
+  );
+  const previewTutor = useMemo(
+    () => tutors.find((tutor) => tutor.id === previewTutorId) ?? null,
+    [previewTutorId, tutors],
+  );
 
   const activeTutors = tutors.filter((tutor) => tutor.status === "ACTIVE").length;
   const inactiveTutors = tutors.length - activeTutors;
   const isEditing = Boolean(selectedTutor);
+  const widgetUrl = embedTutor
+    ? `${window.location.origin}/widget/${embedTutor.id}`
+    : "";
+  const iframeSnippet = widgetUrl
+    ? `<iframe
+  src="${widgetUrl}"
+  title="Chat com tutor DOT Interview"
+  width="380"
+  height="560"
+  style="border: 0; border-radius: 8px;"
+></iframe>`
+    : "";
 
   useEffect(() => {
     refreshTutors();
@@ -90,6 +113,24 @@ export function AdminTutorsPage() {
     setSelectedTutorId(tutor.id);
     setForm(toFormState(tutor));
     setFormError(null);
+  }
+
+  function handleShowEmbed(tutor: Tutor) {
+    setEmbedTutorId(tutor.id);
+    setCopyFeedback(null);
+  }
+
+  async function handleCopySnippet() {
+    if (!iframeSnippet) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(iframeSnippet);
+      setCopyFeedback("Snippet copiado.");
+    } catch {
+      setCopyFeedback("Nao foi possivel copiar automaticamente.");
+    }
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -242,6 +283,9 @@ export function AdminTutorsPage() {
                         <button type="button" onClick={() => handleEditTutor(tutor)}>
                           Editar
                         </button>
+                        <button type="button" onClick={() => handleShowEmbed(tutor)}>
+                          Embed
+                        </button>
                         <button
                           type="button"
                           onClick={() => handleToggleStatus(tutor)}
@@ -346,7 +390,84 @@ export function AdminTutorsPage() {
                 </button>
               </div>
             </form>
+
+            <section className="embed-panel" aria-label="Instrucao de embed">
+              <div className="editor-heading">
+                <p className="eyebrow">Embed</p>
+                <h2>Iframe do tutor</h2>
+              </div>
+
+              {!embedTutor && (
+                <p className="state-message compact">
+                  Selecione Embed em um tutor para gerar o snippet.
+                </p>
+              )}
+
+              {embedTutor && (
+                <>
+                  <div className="embed-summary">
+                    <strong>{embedTutor.name}</strong>
+                    <span>
+                      {embedTutor.status === "ACTIVE"
+                        ? "Pronto para incorporar"
+                        : "Tutor inativo"}
+                    </span>
+                  </div>
+
+                  <label className="snippet-label">
+                    URL do widget
+                    <input readOnly value={widgetUrl} />
+                  </label>
+
+                  <label className="snippet-label">
+                    Snippet HTML
+                    <textarea readOnly rows={7} value={iframeSnippet} />
+                  </label>
+
+                  <div className="form-actions">
+                    <button type="button" onClick={handleCopySnippet}>
+                      Copiar snippet
+                    </button>
+                    <button
+                      className="primary-button"
+                      type="button"
+                      onClick={() => setPreviewTutorId(embedTutor.id)}
+                    >
+                      Testar widget
+                    </button>
+                  </div>
+
+                  {copyFeedback && (
+                    <p className="state-message compact">{copyFeedback}</p>
+                  )}
+                </>
+              )}
+            </section>
           </aside>
+        </section>
+      )}
+
+      {previewTutor && (
+        <section
+          aria-label="Preview do widget"
+          className="preview-backdrop"
+          role="dialog"
+        >
+          <div className="preview-dialog">
+            <header className="preview-header">
+              <div>
+                <p className="eyebrow">Teste rapido</p>
+                <h2>{previewTutor.name}</h2>
+              </div>
+              <button type="button" onClick={() => setPreviewTutorId(null)}>
+                Fechar
+              </button>
+            </header>
+            <iframe
+              src={`/widget/${previewTutor.id}`}
+              title={`Chat com ${previewTutor.name}`}
+            />
+          </div>
         </section>
       )}
     </main>
