@@ -41,6 +41,10 @@ export function listTutors() {
   return apiRequest<Tutor[]>("/tutors");
 }
 
+export function getTutor(tutorId: string) {
+  return apiRequest<Tutor>(`/tutors/${tutorId}`);
+}
+
 export function createTutor(payload: TutorPayload) {
   return apiRequest<Tutor>("/tutors", {
     method: "POST",

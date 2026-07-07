@@ -36,6 +36,22 @@ Exemplos de rotas:
 - Painel admin: `http://localhost:5173/`
 - Widget iframe: `http://localhost:5173/widget/{tutor_id}`
 
+## Widget embutivel
+
+Use a rota `/widget/{tutor_id}` dentro de um iframe na pagina onde o chat deve aparecer.
+
+```html
+<iframe
+  src="http://localhost:5173/widget/{tutor_id}"
+  title="Chat com tutor DOT Interview"
+  width="380"
+  height="560"
+  style="border: 0; border-radius: 8px;"
+></iframe>
+```
+
+O widget carrega os dados do tutor antes da conversa, mostra o nome do tutor no cabecalho e bloqueia o envio de mensagens quando o tutor esta inativo.
+
 ## Validacao
 
 ```bash
