@@ -33,7 +33,7 @@ export function TutorWidgetPage({ tutorId }: TutorWidgetPageProps) {
   const canSendMessage = Boolean(tutorId && isTutorActive && !isSending && message.trim());
   const inputPlaceholder = isTutorActive
     ? "Digite sua pergunta"
-    : "Tutor indisponivel para conversa";
+    : "Tutor indisponível para conversa";
 
   useEffect(() => {
     setTutor(null);
@@ -123,7 +123,7 @@ export function TutorWidgetPage({ tutorId }: TutorWidgetPageProps) {
 
         {!isLoadingTutor && tutor && !isTutorActive && (
           <p className="widget-notice error">
-            Este tutor esta inativo no momento.
+            Este tutor está inativo no momento.
           </p>
         )}
 

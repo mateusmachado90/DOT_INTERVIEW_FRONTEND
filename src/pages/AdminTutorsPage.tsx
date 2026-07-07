@@ -129,7 +129,7 @@ export function AdminTutorsPage() {
       await navigator.clipboard.writeText(iframeSnippet);
       setCopyFeedback("Snippet copiado.");
     } catch {
-      setCopyFeedback("Nao foi possivel copiar automaticamente.");
+      setCopyFeedback("Não foi possível copiar automaticamente.");
     }
   }
 
@@ -258,7 +258,7 @@ export function AdminTutorsPage() {
                   <th>Status</th>
                   <th>Fontes</th>
                   <th>Atualizado em</th>
-                  <th>Acoes</th>
+                  <th>Ações</th>
                 </tr>
               </thead>
               <tbody>
@@ -269,7 +269,7 @@ export function AdminTutorsPage() {
                   >
                     <td>
                       <strong>{tutor.name}</strong>
-                      <span>{tutor.description ?? "Sem descricao"}</span>
+                      <span>{tutor.description ?? "Sem descrição"}</span>
                     </td>
                     <td>
                       <span className={`status-pill ${tutor.status.toLowerCase()}`}>
@@ -311,9 +311,9 @@ export function AdminTutorsPage() {
             )}
           </section>
 
-          <aside className="editor-panel" aria-label="Formulario de tutor">
+          <aside className="editor-panel" aria-label="Formulário de tutor">
             <div className="editor-heading">
-              <p className="eyebrow">{isEditing ? "Edicao" : "Cadastro"}</p>
+              <p className="eyebrow">{isEditing ? "Edição" : "Cadastro"}</p>
               <h2>{isEditing ? "Editar tutor" : "Novo tutor"}</h2>
             </div>
 
@@ -334,7 +334,7 @@ export function AdminTutorsPage() {
               </label>
 
               <label>
-                Descricao
+                Descrição
                 <textarea
                   onChange={(event) =>
                     setForm((currentForm) => ({
@@ -373,7 +373,7 @@ export function AdminTutorsPage() {
                       system_prompt: event.target.value,
                     }))
                   }
-                  placeholder="Voce e um tutor objetivo..."
+                  placeholder="Você é um tutor objetivo..."
                   rows={8}
                   value={form.system_prompt}
                 />
@@ -391,7 +391,7 @@ export function AdminTutorsPage() {
               </div>
             </form>
 
-            <section className="embed-panel" aria-label="Instrucao de embed">
+            <section className="embed-panel" aria-label="Instrução de embed">
               <div className="editor-heading">
                 <p className="eyebrow">Embed</p>
                 <h2>Iframe do tutor</h2>
@@ -456,7 +456,7 @@ export function AdminTutorsPage() {
           <div className="preview-dialog">
             <header className="preview-header">
               <div>
-                <p className="eyebrow">Teste rapido</p>
+                <p className="eyebrow">Teste rápido</p>
                 <h2>{previewTutor.name}</h2>
               </div>
               <button type="button" onClick={() => setPreviewTutorId(null)}>
